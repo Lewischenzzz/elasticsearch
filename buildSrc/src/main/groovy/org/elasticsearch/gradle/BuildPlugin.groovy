@@ -203,6 +203,7 @@ class BuildPlugin implements Plugin<Project> {
     /** Runs the given javascript using jjs from the jdk, and returns the output */
     private static String runJavascript(Project project, String javaHome, String script) {
         ByteArrayOutputStream output = new ByteArrayOutputStream()
+        script = script.replace('"', '\\"') // gradle/groovy does not properly escape the double quote for windows
         project.exec {
             executable = new File(javaHome, 'bin/jrunscript')
             args '-e', script
@@ -476,6 +477,7 @@ class BuildPlugin implements Plugin<Project> {
             jvm "${project.javaHome}/bin/java"
             parallelism System.getProperty('tests.jvms', 'auto')
             ifNoTests 'fail'
+            onNonEmptyWorkDirectory 'wipe'
             leaveTemporary true
 
             // TODO: why are we not passing maxmemory to junit4?
